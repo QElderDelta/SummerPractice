@@ -9,14 +9,9 @@ if __name__ == "__main__":
     request = urllib.request.Request(url, headers = headers)
     html = urllib.request.urlopen(request)
     bsObj = BeautifulSoup(html, features="html.parser")
-    games = bsObj.findAll("a", {"class" : "title"})
-    rates = bsObj.findAll("div", {"class" : "metascore_w large game positive"})
-    p = bsObj.findAll("div", {"class" : "platform"})
-    for game in games:
-        print(game.get_text())
-    for rate in rates:
-        print(rate.get_text())
-    for platform in p:
-        plat = platform.find("span", {"class" : "data"})
-        if plat is not None:
-            print(plat.get_text())        
+    gameBlocks = bsObj.findAll("td", {"class" : "clamp-summary-wrap"})
+    for game in gameBlocks:
+        name = game.find("a", {"class" : "title"})
+        rating = game.find("div", {"class" : "metascore_w large game positive"})
+        platform = game.find("span", {"class" : "data"})
+        print(name.get_text() + ' ' + rating.get_text() + ' ' + ''.join(platform.get_text().strip()))      
