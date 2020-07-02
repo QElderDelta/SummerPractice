@@ -22,6 +22,12 @@ func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	queryPattern := "select * from games_list"
 	amountOfQueries := len(queryParams)
+	_, ok := queryParams["order by"]
+	if ok != false {
+		amountOfQueries--
+	}
+	needsOrdering := false
+	orderBy := ""
 	if amountOfQueries != 0 {
 		queryPattern = strings.Join([]string{queryPattern, " where "}, "")
 		currentQuery := 1
@@ -29,13 +35,20 @@ func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 			valueString := strings.Join(value, "")
 			if query == "platform" {
 				queryPattern = strings.Join([]string{queryPattern, "platform = ", "'", valueString, "' "}, "")
+			} else if query == "order by" {
+				needsOrdering = true
+				orderBy = strings.Join([]string{orderBy, "order by ", valueString}, "")
+				continue
 			} else {
 				queryPattern = strings.Join([]string{queryPattern, query, " > ", valueString, " "}, "")
 			}
-			if currentQuery != amountOfQueries {
+			if currentQuery < amountOfQueries {
 				queryPattern = strings.Join([]string{queryPattern, " and "}, "")
 			}
 			currentQuery++
+		}
+		if needsOrdering {
+			queryPattern = strings.Join([]string{queryPattern, orderBy}, "")
 		}
 		queryPattern = strings.Join([]string{queryPattern, ";"}, "")
 	}
@@ -66,7 +79,7 @@ func main() {
 		fmt.Println(err.Error())
 	}
 	r.HandleFunc("/games", client.QueryHandler)
-	r.Queries("rating", "year", "platform")
+	r.Queries("rating", "year", "platform", "order by")
 	if err := http.ListenAndServe(":9000", r); err != nil {
 		log.Fatal(err)
 	}
