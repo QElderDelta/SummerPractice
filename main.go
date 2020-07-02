@@ -22,11 +22,10 @@ func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	queryPattern := "select * from games_list"
 	amountOfQueries := len(queryParams)
-	_, orderingPresence := queryParams["order by"]
-	if orderingPresence {
+	_, needsOrdering := queryParams["order by"]
+	if needsOrdering {
 		amountOfQueries--
 	}
-	needsOrdering := false
 	orderBy := ""
 	if amountOfQueries != 0 {
 		queryPattern = strings.Join([]string{queryPattern, " where "}, "")
@@ -36,7 +35,6 @@ func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 			if query == "platform" {
 				queryPattern = strings.Join([]string{queryPattern, "platform = ", "'", valueString, "' "}, "")
 			} else if query == "order by" {
-				needsOrdering = true
 				orderBy = strings.Join([]string{orderBy, "order by ", valueString}, "")
 				continue
 			} else {
