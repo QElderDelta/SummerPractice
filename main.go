@@ -22,8 +22,8 @@ func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	queryPattern := "select * from games_list"
 	amountOfQueries := len(queryParams)
-	_, ok := queryParams["order by"]
-	if ok != false {
+	_, orderingPresence := queryParams["order by"]
+	if orderingPresence {
 		amountOfQueries--
 	}
 	needsOrdering := false
