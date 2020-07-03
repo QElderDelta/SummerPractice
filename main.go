@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -16,14 +17,24 @@ type DBClient struct {
 	db *pgx.Conn
 }
 
+type HTMLData struct {
+	Platform []string
+}
+
 //QueryHandler ...
 func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 	w.WriteHeader(http.StatusOK)
 	queryPattern := "select * from games_list"
-	amountOfQueries := len(queryParams)
-	_, needsOrdering := queryParams["order by"]
-	if needsOrdering {
+	amountOfQueries := 0
+	for _, value := range queryParams {
+		if strings.Join(value, "") != "" {
+			amountOfQueries++
+		}
+	}
+	var needsOrdering bool = false
+	if strings.Join(queryParams["order by"], "") != "" {
+		needsOrdering = true
 		amountOfQueries--
 	}
 	orderBy := ""
@@ -32,6 +43,9 @@ func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 		currentQuery := 1
 		for query, value := range queryParams {
 			valueString := strings.Join(value, "")
+			if valueString == "" {
+				continue
+			}
 			if query == "platform" {
 				queryPattern = strings.Join([]string{queryPattern, "platform = ", "'", valueString, "' "}, "")
 			} else if query == "order by" {
@@ -68,6 +82,30 @@ func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//LoadMainPage ...
+func (driver *DBClient) LoadMainPage(w http.ResponseWriter, r *http.Request) {
+	rows, err := driver.db.Query(context.Background(), "select distinct platform from games_list;")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
+	defer rows.Close()
+	var Platform []string
+	for rows.Next() {
+		var platform string
+		err := rows.Scan(&platform)
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+		}
+		Platform = append(Platform, platform)
+	}
+	data := HTMLData{Platform: Platform}
+	template, err := template.ParseFiles("templates/mainpage.html")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	template.Execute(w, data)
+}
+
 func main() {
 	r := mux.NewRouter()
 	db, err := pgx.Connect(context.Background(), "postgres://qelderdelta:lolxd322@localhost/qelderdelta")
@@ -76,9 +114,10 @@ func main() {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+	r.HandleFunc("/", client.LoadMainPage)
 	r.HandleFunc("/games", client.QueryHandler)
 	r.Queries("rating", "year", "platform", "order by")
-	if err := http.ListenAndServe(":9000", r); err != nil {
+	if err := http.ListenAndServe(":8888", r); err != nil {
 		log.Fatal(err)
 	}
 }
