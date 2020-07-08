@@ -19,7 +19,7 @@ def insert_into_database(name, rating, year, platform):
     finally:
         if conn:
             cursor.close()
-            conn.close()        
+            conn.close()                     
 
 if __name__ == "__main__":
     url_pattern = "https://www.metacritic.com/browse/games/score/metascore/all/all/filtered?sort=desc&page="
