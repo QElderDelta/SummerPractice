@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -19,6 +18,17 @@ type DBClient struct {
 
 type HTMLData struct {
 	Platform []string
+}
+
+type Game struct {
+	Name     string
+	Year     int
+	Platform string
+	Rating   int
+}
+
+type DBAnswer struct {
+	Games []Game
 }
 
 //QueryHandler ...
@@ -70,6 +80,7 @@ func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, err.Error())
 	}
 	defer rows.Close()
+	var answer DBAnswer
 	for rows.Next() {
 		var name, platform string
 		var year, rating, id int
@@ -77,9 +88,18 @@ func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Fprintf(w, err.Error())
 		}
-		fmt.Fprintf(w, strings.Join([]string{name, strconv.Itoa(rating),
-			strconv.Itoa(year), platform, "\n"}, " "))
+		game := Game{
+			Name:     name,
+			Year:     year,
+			Platform: platform,
+			Rating:   rating}
+		answer.Games = append(answer.Games, game)
 	}
+	template, err := template.ParseFiles("templates/dbanswer.html")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	template.Execute(w, answer)
 }
 
 //LoadMainPage ...
@@ -116,6 +136,7 @@ func main() {
 	}
 	r.HandleFunc("/", client.LoadMainPage)
 	r.HandleFunc("/games", client.QueryHandler)
+	r.PathPrefix("/styles/").Handler(http.StripPrefix("/styles/", http.FileServer(http.Dir("templates/styles/"))))
 	r.Queries("rating", "year", "platform", "order by")
 	if err := http.ListenAndServe(":8888", r); err != nil {
 		log.Fatal(err)

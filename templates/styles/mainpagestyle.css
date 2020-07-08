@@ -1,0 +1,56 @@
+html {
+    background-image: url("https://i.pinimg.com/originals/71/77/82/717782d78ee313d43a22fdc314c78da9.jpg");
+    background-size: cover;
+}
+
+.container {
+    display: flex;
+    flex-flow: wrap column;
+    justify-content: center;
+    align-items: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size : 20px;
+    height: 100vh;
+}
+
+.actual_form {
+    border-radius: 20px;
+    background-color: rgba(142, 104, 49, 0.4);
+    height: 8%;
+    display: flex;
+    flex-flow: wrap row;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.part_of_form {
+    flex-grow: 1;
+    text-align: center;
+    margin-left: 1em;
+    margin-right: 1em;
+    color : lightgray;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size : 24px;
+}
+
+select, input, option {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size : 20px;
+    background-color: rgba(246, 232, 197, 0.4);
+}
+
+input {
+    border : none;
+}
+
+
+input[type=submit] {
+    color: white;
+    background-color: rgb(142, 104, 49);
+    font-size : 20px;
+    border-radius: 20px;
+    height: 3%;
+    width: 3%;
+}

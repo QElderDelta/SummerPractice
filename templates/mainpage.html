@@ -4,37 +4,42 @@
         <title>
             XD
         </title>
+        <link rel="stylesheet" href="styles/mainpagestyle.css">
     </head>
     <body>
-        <form method="GET" action = "/games">
-            <div>
-                <label>Platform:</label>
-                <select id = "platform" name = "platform">
-                    <option value=""></option>
-                    {{range .Platform}}
-                    <option value="{{.}}">{{.}}</option>
-                    {{end}}
-                </select>
-            </div>
-            <div>
-                <label>Rating must be higher than:</label>
-                <input type = "text" id = "rating" name = "rating"><br>
-            </div>
-            <div>
-                <label>Game was released after:</label>
-                <input type = "text" id = "year" name = "year"><br>
-            </div>
-            <div>
-                <label>Sort results by:</label>
-                <select id = "order by" name = "order by">
-                    <option value=""></option>
-                    <option value="rating desc">Rating descending</option>
-                    <option value="rating">Rating</option>
-                    <option value="year desc">Year descending</option>
-                    <option value="year">Year</option>
-                </select>
-            </div>
-            <input type="submit" value="submit">
-        </form>
+            <form method="GET" action = "/games">
+                <div class = "container">
+                    <div class = "actual_form">
+                        <div class = "part_of_form">
+                            <label>Platform:</label>
+                            <select id = "platform" name = "platform">
+                                <option value="">Doesn't matter</option>
+                                {{range .Platform}}
+                                <option value="{{.}}">{{.}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                        <div class = "part_of_form">
+                            <label>Rating must be higher than:</label>
+                            <input type = "text" id = "rating" name = "rating" placeholder="Doesn't matter"><br>
+                        </div>
+                        <div class = "part_of_form">
+                            <label>Game was released after:</label>
+                            <input type = "text" id = "year" name = "year" placeholder="Doesn't matter"><br>
+                        </div>
+                        <div class = "part_of_form">
+                            <label>Sort results by:</label>
+                            <select id = "order by" name = "order by">
+                                <option value="">Doesn't matter</option>
+                                <option value="rating desc">Rating descending</option>
+                                <option value="rating">Rating</option>
+                                <option value="year desc">Year descending</option>
+                                <option value="year">Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <input type="submit" value="Find">
+                </div>
+            </form>
     </body>
 </html>
