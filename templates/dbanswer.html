@@ -10,13 +10,30 @@
         <div class = "container">
             {{range .Games}}
             <div class = "answer_row">
-                <div class = "Name">
-                    <h1>{{.Name}}</h1>    
+                <div class = "summary">
+                    <div class = "name">
+                        <h3>{{.Name}}</h3>    
+                    </div>
+                    <div class = "info">
+                        <p>Year : {{.Year}}, Platform : {{.Platform}}</p>
+                    </div>
                 </div>
-                <div class = "Info">
-                    <p>Year : {{.Year}}, Platform : {{.Platform}}, Rating : {{.Rating}}</p>
-                </div>
-            </div>
+                <div class = "rating">
+                    {{if ge .Rating 80}}
+                    <div class="rating_box_green">
+                        {{.Rating}}
+                    </div>
+                    {{else if ge .Rating 40}}
+                    <div class="rating_box_yellow">
+                        {{.Rating}}
+                    </div>
+                    {{else}}
+                    <div class="rating_box_red">
+                        {{.Rating}}
+                    </div>
+                    {{end}}
+                </div>   
+            </div> 
             <div class = "break"></div>
             {{end}}
         </div>
