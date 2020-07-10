@@ -35,7 +35,7 @@ type DBAnswer struct {
 func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 	w.WriteHeader(http.StatusOK)
-	queryPattern := "select * from games_list"
+	queryPattern := "select * from games_list "
 	amountOfQueries := 0
 	for _, value := range queryParams {
 		if strings.Join(value, "") != "" {
@@ -69,9 +69,12 @@ func (driver *DBClient) QueryHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			currentQuery++
 		}
-		if needsOrdering {
-			queryPattern = strings.Join([]string{queryPattern, orderBy}, "")
+		if !needsOrdering {
+			queryPattern = strings.Join([]string{queryPattern, ";"}, "")
 		}
+	}
+	if needsOrdering {
+		queryPattern = strings.Join([]string{queryPattern, strings.Join([]string{"order by ", strings.Join(queryParams["order by"], "")}, "")}, "")
 		queryPattern = strings.Join([]string{queryPattern, ";"}, "")
 	}
 	fmt.Println(queryPattern)
