@@ -1,13 +1,13 @@
 import urllib.request
-from bs4 import BeautifulSoup
 import time
+from bs4 import BeautifulSoup
 import psycopg2
 
 def insert_into_database(name, rating, year, platform):
     try:
-        conn = psycopg2.connect(dbname='qelderdelta', 
-        user = 'qelderdelta', password = 'lolxd322', 
-        host = 'localhost')
+        conn = psycopg2.connect(dbname='qelderdelta',
+                                user='qelderdelta', password='lolxd322',
+                                host='localhost')
         cursor = conn.cursor()
         insert_query = """ INSERT INTO games_list (name, rating, year, platform) VALUES (%s, %s, %s, %s)"""
         to_insert = (name, rating, year, platform)
@@ -19,17 +19,17 @@ def insert_into_database(name, rating, year, platform):
     finally:
         if conn:
             cursor.close()
-            conn.close()                     
+            conn.close()
 
 if __name__ == "__main__":
-    url_pattern = "https://www.metacritic.com/browse/games/score/metascore/all/all/filtered?sort=desc&page="
+    URL_PATTERN = "https://www.metacritic.com/browse/games/score/metascore/all/all/filtered?sort=desc&page="
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:45.0) Gecko/20100101 Firefox/45.0'    
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:45.0) Gecko/20100101 Firefox/45.0'
     }
     for i in range(30):
         print("Processing page #", i + 1)
-        url = url_pattern + str(i)
-        request = urllib.request.Request(url, headers = headers)
+        URL = URL_PATTERN + str(i)
+        request = urllib.request.Request(URL, headers=headers)
         html = urllib.request.urlopen(request)
         bs_obj = BeautifulSoup(html, features="html.parser")
         game_blocks = bs_obj.findAll("td", {"class" : "clamp-summary-wrap"})
@@ -37,7 +37,8 @@ if __name__ == "__main__":
             name = game.find("a", {"class" : "title"})
             rating = game.find("div", {"class" : "metascore_w large game positive"})
             info = game.find("div", {"class" : "clamp-details"})
-            year = info.find("span", recursive = False)
+            year = info.find("span", recursive=False)
             platform = info.find("span", {"class" : "data"})
-            insert_into_database(name.get_text(), rating.get_text(), year.get_text().split(',')[1], ''.join(platform.get_text().strip()))  
-        time.sleep(2)          
+            insert_into_database(name.get_text(), rating.get_text(),
+                                 year.get_text().split(',')[1], ''.join(platform.get_text().strip()))
+        time.sleep(2)
